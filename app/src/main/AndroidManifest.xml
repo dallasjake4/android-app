@@ -25,7 +25,9 @@
                 android:value="com.mycompany.homework4.MainActivity" />
         </activity>
 
-        <meta-data android:name="com.google.android.maps.v2.API_KEY" android:value="AIzaSyByCHNYw10-kgLOorZFghC10cqTDYlZuys"/>
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyByCHNYw10-kgLOorZFghC10cqTDYlZuys"/>
     </application>
 
 
