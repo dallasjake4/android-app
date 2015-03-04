@@ -2,19 +2,30 @@ package com.mycompany.homework4;
 
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 
 
 public class MainActivity extends ActionBarActivity {
+
+    private GoogleMap map;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        map = ((MapFragment) getFragmentManager().findFragmentById(R.id.mapFragment)).getMap();
+
     }
 
 
@@ -40,12 +51,14 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void updateMap(String location){
+
+    }
+
     public void findLocation(View view){
-        Intent intent = new Intent(this, MapActivity.class);
         EditText location = (EditText) findViewById(R.id.location);
         String locationText = location.getText().toString();
 
-        intent.putExtra("location", locationText);
-        startActivity(intent);
+        updateMap(locationText);
     }
 }
