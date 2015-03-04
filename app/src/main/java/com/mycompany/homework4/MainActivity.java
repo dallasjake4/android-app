@@ -103,10 +103,10 @@ public class MainActivity extends ActionBarActivity {
         updateMap(locationText);
     }
 
-    private class FindLocationTask extends AsyncTask<String, Void, LatLng> {
+    private class FindLocationTask extends AsyncTask<String, Void, String[]> {
 
         @Override
-        protected LatLng doInBackground(String... urls) {
+        protected String[] doInBackground(String... urls) {
 
             HttpGet request = new HttpGet(urls[0]);
 
@@ -125,14 +125,23 @@ public class MainActivity extends ActionBarActivity {
                 Element firstLocation = (Element) nodeList.item(0);
                 NodeList locationTagList = firstLocation.getElementsByTagName("location");
                 Element locationTag = (Element) locationTagList.item(0);
+
                 NodeList latList = locationTag.getElementsByTagName("lat");
                 Element lat = (Element) latList.item(0);
                 String latStr = lat.getFirstChild().getTextContent();
+
                 NodeList lngList = locationTag.getElementsByTagName("lng");
                 Element lng = (Element) lngList.item(0);
                 String lngStr = lng.getFirstChild().getTextContent();
-                LatLng latLng = new LatLng(Double.parseDouble(latStr), Double.parseDouble(lngStr));
-                return latLng;
+
+                NodeList addressList = firstLocation.getElementsByTagName("formatted_address");
+                Element formattedAddress = (Element) addressList.item(0);
+                String formattedAddressStr = formattedAddress.getFirstChild().getTextContent();
+
+                String[] result = {latStr, lngStr, formattedAddressStr};
+                return result;
+
+
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -145,10 +154,13 @@ public class MainActivity extends ActionBarActivity {
         }
 
         @Override
-        protected void onPostExecute(LatLng latLong){
+        protected void onPostExecute(String[] result){
+
+            LatLng latLng = new LatLng(Double.parseDouble(result[0]), Double.parseDouble(result[1]));
             map.clear();
-            Marker marker = map.addMarker(new MarkerOptions().position(latLong));
-            map.moveCamera(CameraUpdateFactory.newLatLng(latLong));
+            Marker marker = map.addMarker(new MarkerOptions().position(latLng).title(result[2]));
+            marker.showInfoWindow();
+            map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
             map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
         }
     }
