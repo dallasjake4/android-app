@@ -69,6 +69,8 @@ public class MainActivity extends ActionBarActivity {
     private static final String SAVED_LOCATIONS = "savedLocations";
     private Marker marker;
     private Set<String> savedLocations = new HashSet<String>();
+    public static final String PREFS_NAME = "myPrefs";
+    static SharedPreferences sp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +79,7 @@ public class MainActivity extends ActionBarActivity {
 
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.mapFragment)).getMap();
 
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences sp = getSharedPreferences(PREFS_NAME, 0);
         savedLocations = new HashSet<String>(sp.getStringSet(SAVED_LOCATIONS, new HashSet<String>()));
 
         Intent intent = getIntent();
@@ -108,9 +110,6 @@ public class MainActivity extends ActionBarActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_saved_locations) {
             Intent intent = new Intent(this, com.mycompany.homework4.SavedLocations.class);
-            String[] array = Arrays.copyOf(savedLocations.toArray(), savedLocations.toArray().length, String[].class);
-            intent.putExtra("savedLocations", array);
-
             startActivity(intent);
         }
 
@@ -131,7 +130,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void saveLocation(View view) {
-        if (!savedLocations.contains(marker)) {
+        if (!savedLocations.contains(marker.getTitle())) {
             savedLocations.add(marker.getTitle());
         }
     }
@@ -139,15 +138,8 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public void onPause() {
         super.onPause();
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        sp.edit().putStringSet(SAVED_LOCATIONS, savedLocations).commit();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        sp.edit().putStringSet(SAVED_LOCATIONS, savedLocations).commit();
+        SharedPreferences sp = getSharedPreferences(PREFS_NAME, 0);
+        sp.edit().putStringSet(SAVED_LOCATIONS, savedLocations).apply();
     }
 
     private class FindLocationTask extends AsyncTask<String, Void, String[]> {

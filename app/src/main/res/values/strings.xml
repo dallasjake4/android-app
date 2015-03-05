@@ -11,5 +11,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="save_button_text">Save location</string>
     <string name="title_activity_saved_locations">SavedLocations</string>
+    <string name="delete_button_text">Delete</string>
 
 </resources>
