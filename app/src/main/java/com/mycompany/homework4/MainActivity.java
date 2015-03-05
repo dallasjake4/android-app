@@ -1,7 +1,9 @@
 package com.mycompany.homework4;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.Fragment;
@@ -10,6 +12,7 @@ import android.util.Xml;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 
@@ -47,6 +50,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.AbstractCollection;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -58,6 +66,9 @@ public class MainActivity extends ActionBarActivity {
     private GoogleMap map;
     private static final String SERVER_KEY = "&key=AIzaSyAAp2zFbyZdk4cUDB9O0u_3nk2BODucxws";
     private static final String GEOCODING_URL = "https://maps.googleapis.com/maps/api/geocode/xml?address=";
+    private static final String SAVED_LOCATIONS = "savedLocations";
+    private Marker marker;
+    private Set<String> savedLocations = new HashSet<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +76,18 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.mapFragment)).getMap();
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        savedLocations = new HashSet<String>(sp.getStringSet(SAVED_LOCATIONS, new HashSet<String>()));
+
+        Intent intent = getIntent();
+
+
+        String location = intent.getStringExtra("savedLocation");
+        if(location!=null) {
+            updateMap(location);
+        }
+
     }
 
 
@@ -83,8 +106,12 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_saved_locations) {
+            Intent intent = new Intent(this, com.mycompany.homework4.SavedLocations.class);
+            String[] array = Arrays.copyOf(savedLocations.toArray(), savedLocations.toArray().length, String[].class);
+            intent.putExtra("savedLocations", array);
+
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
@@ -101,6 +128,26 @@ public class MainActivity extends ActionBarActivity {
         String locationText = location.getText().toString();
 
         updateMap(locationText);
+    }
+
+    public void saveLocation(View view) {
+        if (!savedLocations.contains(marker)) {
+            savedLocations.add(marker.getTitle());
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        sp.edit().putStringSet(SAVED_LOCATIONS, savedLocations).commit();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        sp.edit().putStringSet(SAVED_LOCATIONS, savedLocations).commit();
     }
 
     private class FindLocationTask extends AsyncTask<String, Void, String[]> {
@@ -142,7 +189,6 @@ public class MainActivity extends ActionBarActivity {
                 return result;
 
 
-
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ParserConfigurationException e) {
@@ -153,15 +199,19 @@ public class MainActivity extends ActionBarActivity {
             return null;
         }
 
+
         @Override
-        protected void onPostExecute(String[] result){
+        protected void onPostExecute(String[] result) {
 
             LatLng latLng = new LatLng(Double.parseDouble(result[0]), Double.parseDouble(result[1]));
             map.clear();
-            Marker marker = map.addMarker(new MarkerOptions().position(latLng).title(result[2]));
+            marker = map.addMarker(new MarkerOptions().position(latLng).title(result[2]));
+
             marker.showInfoWindow();
             map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
             map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
+            Button saveButton = (Button) findViewById(R.id.save_button);
+            saveButton.setVisibility(View.VISIBLE);
         }
     }
 }

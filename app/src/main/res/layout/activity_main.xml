@@ -26,15 +26,28 @@
         android:layout_height="match_parent"
         android:layout_width="wrap_content"
         android:text="@string/find_location_button_text"
-        android:onClick="findLocation">
+        android:onClick="findLocation"/>
 
-    </Button>
+
     </LinearLayout>
+
 
    <fragment
        class="com.google.android.gms.maps.MapFragment"
        android:layout_width="match_parent"
-       android:layout_height="match_parent"
+       android:layout_height="0dp"
+       android:layout_weight="1"
        android:id="@+id/mapFragment"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/min_clickable"
+        android:text="@string/save_button_text"
+        android:onClick="saveLocation"
+        android:id="@+id/save_button"
+        android:visibility="gone"/>
+
+
 
 </LinearLayout>
