@@ -4,23 +4,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.util.Xml;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -30,32 +21,19 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.apache.http.Header;
-import org.apache.http.HeaderIterator;
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.RequestLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.xmlpull.v1.XmlPullParser;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.AbstractCollection;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -64,7 +42,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 
-public class MainActivity extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks{
+public class MainActivity extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks {
 
     private GoogleMap map;
     private static final String SERVER_KEY = "&key=AIzaSyAAp2zFbyZdk4cUDB9O0u_3nk2BODucxws";
@@ -92,10 +70,9 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
         addLocationServicesApi();
 
         String location = intent.getStringExtra("savedLocation");
-        if(location!=null) {
+        if (location != null) {
             updateMap(location);
         }
-
 
 
     }
@@ -110,7 +87,7 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
 
     @Override
     //this executes once the app is connected to location services
-    public void onConnected(Bundle connection){
+    public void onConnected(Bundle connection) {
         //get the user's location
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
@@ -126,14 +103,14 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
         mGoogleApiClient.disconnect();
     }
 
-    public void locateMe(View v){
+    public void locateMe(View v) {
         //connect to location services
         mGoogleApiClient.connect();
     }
 
 
     @Override
-    public void onConnectionSuspended(int i){
+    public void onConnectionSuspended(int i) {
 
     }
 
@@ -174,7 +151,7 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
     }
 
     public void saveLocation(View view) {
-        if(marker.getTitle()==null){
+        if (marker.getTitle() == null) {
             //this happens when accessing a user's current location
             //could do another AsycTask to do reverse geocoding get the address and save the location
             return;

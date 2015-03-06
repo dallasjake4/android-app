@@ -2,8 +2,8 @@ package com.mycompany.homework4;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,8 +13,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,6 +24,7 @@ public class SavedLocations extends ActionBarActivity {
     public static final String PREFS_NAME = "myPrefs";
     private static final String SAVED_LOCATIONS = "savedLocations";
     static SharedPreferences sp;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +38,7 @@ public class SavedLocations extends ActionBarActivity {
 
         LayoutInflater inflater = getLayoutInflater();
 
-        for(String marker: savedLocationsArray) {
+        for (String marker : savedLocationsArray) {
             //set up each saved location
             LinearLayout item = (LinearLayout) inflater.inflate(R.layout.saved_locations_list_item, null);
             item.setOnClickListener(new View.OnClickListener() {
@@ -92,7 +91,7 @@ public class SavedLocations extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void findLocation(View v){
+    public void findLocation(View v) {
         TextView textView = (TextView) v.findViewById(R.id.savedLocationText);
         String savedLocation = textView.getText().toString();
 
@@ -102,7 +101,7 @@ public class SavedLocations extends ActionBarActivity {
 
     }
 
-    public void deleteSavedLocation(View v){
+    public void deleteSavedLocation(View v) {
         //get the String that is being removed from savedLocations
         View savedLocationLayout = (View) v.getParent();
         TextView savedLocationName = (TextView) savedLocationLayout.findViewById(R.id.savedLocationText);
@@ -113,6 +112,6 @@ public class SavedLocations extends ActionBarActivity {
         sp.edit().putStringSet(SAVED_LOCATIONS, savedLocations).apply();
 
         //remove the view containing the string and delete button
-        ((ViewGroup)savedLocationLayout.getParent()).removeView(savedLocationLayout);
+        ((ViewGroup) savedLocationLayout.getParent()).removeView(savedLocationLayout);
     }
 }
