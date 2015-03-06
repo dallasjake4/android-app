@@ -2,6 +2,7 @@ package com.mycompany.homework4;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
@@ -20,6 +21,8 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -61,7 +64,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements GoogleApiClient.ConnectionCallbacks{
 
     private GoogleMap map;
     private static final String SERVER_KEY = "&key=AIzaSyAAp2zFbyZdk4cUDB9O0u_3nk2BODucxws";
@@ -71,6 +74,8 @@ public class MainActivity extends ActionBarActivity {
     private Set<String> savedLocations = new HashSet<String>();
     public static final String PREFS_NAME = "myPrefs";
     static SharedPreferences sp;
+
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,14 +89,53 @@ public class MainActivity extends ActionBarActivity {
 
         Intent intent = getIntent();
 
+        addLocationServicesApi();
 
         String location = intent.getStringExtra("savedLocation");
         if(location!=null) {
             updateMap(location);
         }
 
+
+
     }
 
+    //add location services api, allowing the app to connect to location services
+    protected synchronized void addLocationServicesApi() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+    @Override
+    //this executes once the app is connected to location services
+    public void onConnected(Bundle connection){
+        //get the user's location
+        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+
+        //display the location on the map
+        LatLng latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+        map.clear();
+        marker = map.addMarker(new MarkerOptions().position(latLng));
+        map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
+        Button saveButton = (Button) findViewById(R.id.save_button);
+        saveButton.setVisibility(View.VISIBLE);
+        mGoogleApiClient.disconnect();
+    }
+
+    public void locateMe(View v){
+        //connect to location services
+        mGoogleApiClient.connect();
+    }
+
+
+    @Override
+    public void onConnectionSuspended(int i){
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -130,6 +174,11 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void saveLocation(View view) {
+        if(marker.getTitle()==null){
+            //this happens when accessing a user's current location
+            //could do another AsycTask to do reverse geocoding get the address and save the location
+            return;
+        }
         if (!savedLocations.contains(marker.getTitle())) {
             savedLocations.add(marker.getTitle());
         }
