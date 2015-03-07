@@ -47,6 +47,7 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
     private GoogleMap map;
     private static final String SERVER_KEY = "&key=AIzaSyAAp2zFbyZdk4cUDB9O0u_3nk2BODucxws";
     private static final String GEOCODING_URL = "https://maps.googleapis.com/maps/api/geocode/xml?address=";
+    private static final String REVERSE_GE0_URL = "https://maps.googleapis.com/maps/api/geocode/xml?latlng=";
     private static final String SAVED_LOCATIONS = "savedLocations";
     private Marker marker;
     private Set<String> savedLocations = new HashSet<String>();
@@ -90,17 +91,28 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
     public void onConnected(Bundle connection) {
         //get the user's location
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
+              mGoogleApiClient);
 
         //display the location on the map
         LatLng latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-        map.clear();
+        Double latTemp = mLastLocation.getLatitude();
+        String lat = latTemp.toString();
+        Double lngTemp = mLastLocation.getLongitude();
+        String lng = lngTemp.toString();
+        String url = REVERSE_GE0_URL + lat + "," + lng + SERVER_KEY;
+
+        new FindLocationTask().execute(url);
+        ;
+        ;
+
+       /* map.clear();
         marker = map.addMarker(new MarkerOptions().position(latLng));
         map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
         Button saveButton = (Button) findViewById(R.id.save_button);
-        saveButton.setVisibility(View.VISIBLE);
+        saveButton.setVisibility(View.VISIBLE);*/
         mGoogleApiClient.disconnect();
+
     }
 
     public void locateMe(View v) {
@@ -232,4 +244,5 @@ public class MainActivity extends ActionBarActivity implements GoogleApiClient.C
             saveButton.setVisibility(View.VISIBLE);
         }
     }
+
 }
